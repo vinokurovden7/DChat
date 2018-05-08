@@ -27,7 +27,10 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
@@ -139,7 +142,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode == GALLERY_PIC && resultCode == RESULT_OK){
@@ -175,7 +178,12 @@ public class SettingsActivity extends AppCompatActivity {
                         .setQuality(75)
                         .compressToBitmap(thumb_filePath);
 
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                final byte[] thumb_byte = baos.toByteArray();
+
                 StorageReference filepath = mImageStorage.child("profile_images").child(mCurrentUser.getEmail()).child("profile_image.jpg");
+                final StorageReference thumb_filepath = mImageStorage.child("profile_image").child("thumbs").child(mCurrentUser.getEmail()).child("profile_thumbs.jpg");
 
                 filepath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
@@ -185,18 +193,42 @@ public class SettingsActivity extends AppCompatActivity {
 
                             final String download_url = task.getResult().getDownloadUrl().toString();
 
-                            mUserDatabase.child("image").setValue(download_url).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            UploadTask uploadTask = thumb_filepath.putBytes(thumb_byte);
+                            uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                 @Override
-                                public void onComplete(@NonNull Task<Void> task) {
+                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
 
-                                    if(task.isSuccessful()){
+                                    final String thumb_downloadURL = thumb_task.getResult().getDownloadUrl().toString();
 
+                                    if(thumb_task.isSuccessful()){
+
+                                        //HashMap<String,String> update_hashMap = new HashMap<>();
+                                        Map update_hashMap = new HashMap();
+                                        update_hashMap.put("image", download_url);
+                                        update_hashMap.put("thumb_image", thumb_downloadURL);
+
+                                        mUserDatabase.updateChildren(update_hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+
+                                                if(task.isSuccessful()){
+
+                                                    mProgressDialog.dismiss();
+                                                    Toast.makeText(getApplicationContext(), "Файл успешно загружен!", Toast.LENGTH_LONG).show();
+                                                    Picasso.with(SettingsActivity.this).load(thumb_downloadURL).into(mImage);
+
+                                                } else {
+                                                    Toast.makeText(getApplicationContext(), "Ошибка загрузки файла: "+task.getException().toString(), Toast.LENGTH_LONG).show();
+                                                }
+
+                                            }
+                                        });
+                                    }
+                                    else {
+
+                                        Toast.makeText(getApplicationContext(), "Ошибка загрузки файла: "+thumb_task.getException().toString(), Toast.LENGTH_LONG).show();
                                         mProgressDialog.dismiss();
-                                        Toast.makeText(getApplicationContext(), "Файл успешно загружен!", Toast.LENGTH_LONG).show();
-                                        Picasso.with(SettingsActivity.this).load(download_url).into(mImage);
 
-                                    } else {
-                                        Toast.makeText(getApplicationContext(), "Ошибка загрузки файла: "+task.getException().toString(), Toast.LENGTH_LONG).show();
                                     }
 
                                 }
