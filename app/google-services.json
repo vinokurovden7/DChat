@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "747147116901",
+    "firebase_url": "https://dchat-17b19.firebaseio.com",
+    "project_id": "dchat-17b19",
+    "storage_bucket": "dchat-17b19.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:747147116901:android:c3ff0675f666d584",
+        "android_client_info": {
+          "package_name": "com.den.vin.dchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "747147116901-gn9gucetttduaf6vb9miirjckdl93f7n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.den.vin.dchat",
+            "certificate_hash": "e2e78899580cf491fb9d60bbefa1c7c6ea600f6b"
+          }
+        },
+        {
+          "client_id": "747147116901-iln0lbt0begtr90ksuqpajvkgj5r9709.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBs-oa0GZCfNKQjoTvdT1CXPDOKiXs7rok"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "747147116901-iln0lbt0begtr90ksuqpajvkgj5r9709.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
