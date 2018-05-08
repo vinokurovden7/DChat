@@ -2,6 +2,7 @@ package com.den.vin.dchat;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,7 +27,10 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 
+import java.io.File;
+
 import de.hdodenhof.circleimageview.CircleImageView;
+import id.zelory.compressor.Compressor;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -162,6 +166,14 @@ public class SettingsActivity extends AppCompatActivity {
                 mProgressDialog.show();
 
                 Uri resultUri = result.getUri();
+
+                File thumb_filePath = new File(resultUri.getPath());
+
+                Bitmap thumb_bitmap = new Compressor(this)
+                        .setMaxWidth(200)
+                        .setMaxHeight(200)
+                        .setQuality(75)
+                        .compressToBitmap(thumb_filePath);
 
                 StorageReference filepath = mImageStorage.child("profile_images").child(mCurrentUser.getEmail()).child("profile_image.jpg");
 
