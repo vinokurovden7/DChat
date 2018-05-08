@@ -98,7 +98,12 @@ public class SettingsActivity extends AppCompatActivity {
 
                 profile_name.setText(name);
                 profile_status.setText(status);
-                Picasso.with(SettingsActivity.this).load(image).into(mImage);
+
+                if (!image.equals("default")) {
+
+                    Picasso.with(SettingsActivity.this).load(image).placeholder(R.drawable.default_account_icon).into(mImage);
+
+                }
 
 
                 mRegProgress.dismiss();
