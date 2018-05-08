@@ -98,10 +98,16 @@ public class ProfileActivity extends AppCompatActivity {
                                 current_state = "req_received";
                                 profileBtn.setText("Принять запрос на добавление");
 
+                                deleteBtn.setVisibility(View.VISIBLE);
+                                deleteBtn.setEnabled(true);
+
                             } else if(request_type.equals("sent")) {
 
                                 current_state = "req_sent";
                                 profileBtn.setText("Отменить запрос на добавление");
+
+                                deleteBtn.setVisibility(View.INVISIBLE);
+                                deleteBtn.setEnabled(false);
 
                             }
 
@@ -117,6 +123,9 @@ public class ProfileActivity extends AppCompatActivity {
 
                                        current_state = "friends";
                                        profileBtn.setText("Удалить контакт");
+
+                                       deleteBtn.setVisibility(View.INVISIBLE);
+                                       deleteBtn.setEnabled(false);
 
                                    }
 
@@ -174,7 +183,10 @@ public class ProfileActivity extends AppCompatActivity {
                                        current_state = "req_sent";
                                        profileBtn.setText("Отменить запрос на добавление");
 
-                                       Toast.makeText(ProfileActivity.this, "Запрос успешно отправлен", Toast.LENGTH_LONG).show();
+                                       deleteBtn.setVisibility(View.INVISIBLE);
+                                       deleteBtn.setEnabled(false);
+
+                                      // Toast.makeText(ProfileActivity.this, "Запрос успешно отправлен", Toast.LENGTH_LONG).show();
 
                                    }
                                });
@@ -205,6 +217,9 @@ public class ProfileActivity extends AppCompatActivity {
                                     profileBtn.setEnabled(true);
                                     current_state = "not_friends";
                                     profileBtn.setText("Добавить в контакты");
+
+                                    deleteBtn.setVisibility(View.INVISIBLE);
+                                    deleteBtn.setEnabled(false);
 
                                 }
                             });
@@ -240,6 +255,9 @@ public class ProfileActivity extends AppCompatActivity {
                                                     profileBtn.setEnabled(true);
                                                     current_state = "friends";
                                                     profileBtn.setText("Удалить контакт");
+
+                                                    deleteBtn.setVisibility(View.INVISIBLE);
+                                                    deleteBtn.setEnabled(false);
 
                                                 }
                                             });
