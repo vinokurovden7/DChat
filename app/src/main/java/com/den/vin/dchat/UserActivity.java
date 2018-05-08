@@ -1,6 +1,8 @@
 package com.den.vin.dchat;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,10 +12,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Picasso;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class UserActivity extends AppCompatActivity {
@@ -68,7 +74,22 @@ public class UserActivity extends AppCompatActivity {
 
                viewHolder.setName(users.getName());
                viewHolder.setUserStatus(users.getStatus());
-                mRegProgress.dismiss();
+               viewHolder.setUserImage(users.getThumb_image(), getApplicationContext());
+
+               final String use_id = getRef(position).getKey();
+
+               viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                   @Override
+                   public void onClick(View v) {
+
+                       Intent profileIntent = new Intent(UserActivity.this, ProfileActivity.class);
+                       profileIntent.putExtra("user_id", use_id);
+                       startActivity(profileIntent);
+
+                   }
+               });
+
+               mRegProgress.dismiss();
 
             }
         };
@@ -99,6 +120,14 @@ public class UserActivity extends AppCompatActivity {
 
             TextView userStatusView =  mView.findViewById(R.id.user_single_status);
             userStatusView.setText(status);
+
+        }
+
+        public void setUserImage(String thumb_image, Context ctx){
+
+            CircleImageView userMageView = (CircleImageView) mView.findViewById(R.id.user_single_image);
+
+            Picasso.with(ctx).load(thumb_image).placeholder(R.drawable.default_account_icon).into(userMageView);
 
         }
 

@@ -24,6 +24,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 
@@ -71,7 +73,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         String current_uid = mCurrentUser.getUid();
-        mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(current_uid);
 
         profile_name = (TextView) findViewById(R.id.profile_name);
         profile_status = (TextView) findViewById(R.id.profile_status);
@@ -94,12 +95,15 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(current_uid);
+        mUserDatabase.keepSynced(true);
+
         mUserDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 String name = dataSnapshot.child("name").getValue().toString();
-                String image = dataSnapshot.child("image").getValue().toString();
+                final String image = dataSnapshot.child("image").getValue().toString();
                 String status = dataSnapshot.child("status").getValue().toString();
                 String thumb_image = dataSnapshot.child("thumb_image").getValue().toString();
 
@@ -108,7 +112,21 @@ public class SettingsActivity extends AppCompatActivity {
 
                 if (!image.equals("default")) {
 
-                    Picasso.with(SettingsActivity.this).load(image).placeholder(R.drawable.default_account_icon).into(mImage);
+                    //Picasso.with(SettingsActivity.this).load(image).placeholder(R.drawable.default_account_icon).into(mImage);
+
+                    Picasso.with(SettingsActivity.this).load(image).networkPolicy(NetworkPolicy.OFFLINE).placeholder(R.drawable.default_account_icon).into(mImage, new Callback() {
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onError() {
+
+                            Picasso.with(SettingsActivity.this).load(image).placeholder(R.drawable.default_account_icon).into(mImage);
+
+                        }
+                    });
 
                 }
 
@@ -173,8 +191,8 @@ public class SettingsActivity extends AppCompatActivity {
                 File thumb_filePath = new File(resultUri.getPath());
 
                 Bitmap thumb_bitmap = new Compressor(this)
-                        .setMaxWidth(200)
-                        .setMaxHeight(200)
+                        .setMaxWidth(1024)
+                        .setMaxHeight(1024)
                         .setQuality(75)
                         .compressToBitmap(thumb_filePath);
 
@@ -182,7 +200,7 @@ public class SettingsActivity extends AppCompatActivity {
                 thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 final byte[] thumb_byte = baos.toByteArray();
 
-                StorageReference filepath = mImageStorage.child("profile_images").child(mCurrentUser.getEmail()).child("profile_image.jpg");
+                StorageReference filepath = mImageStorage.child("profile_image").child(mCurrentUser.getEmail()).child("profile_image.jpg");
                 final StorageReference thumb_filepath = mImageStorage.child("profile_image").child("thumbs").child(mCurrentUser.getEmail()).child("profile_thumbs.jpg");
 
                 filepath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
