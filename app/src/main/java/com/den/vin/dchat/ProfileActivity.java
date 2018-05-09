@@ -24,6 +24,7 @@ import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -34,6 +35,7 @@ public class ProfileActivity extends AppCompatActivity {
     private DatabaseReference mUsersDatabase;
     private DatabaseReference mFriendRequestDatabase;
     private DatabaseReference mFriendDatabase;
+    private DatabaseReference mNotificationDatabase;
 
     private FirebaseUser mCurrent_user;
 
@@ -52,6 +54,7 @@ public class ProfileActivity extends AppCompatActivity {
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(user_id);
         mFriendRequestDatabase = FirebaseDatabase.getInstance().getReference().child("Friend_req");
         mFriendDatabase = FirebaseDatabase.getInstance().getReference().child("Friend");
+        mNotificationDatabase = FirebaseDatabase.getInstance().getReference().child("notifications");
         mCurrent_user = FirebaseAuth.getInstance().getCurrentUser();
 
         profileImage = (ImageView) findViewById(R.id.profile_image);
@@ -59,7 +62,7 @@ public class ProfileActivity extends AppCompatActivity {
         profileStatus = (TextView) findViewById(R.id.profile_status);
         profileFriendsCount = (TextView) findViewById(R.id.profile_totalFriends);
         profileBtn = (Button) findViewById(R.id.profile_send_cont_btn);
-        deleteBtn = (Button) findViewById(R.id.delete_friend_btn);
+        //deleteBtn = (Button) findViewById(R.id.delete_friend_btn);
 
         current_state = "not_friends";
 
@@ -98,16 +101,16 @@ public class ProfileActivity extends AppCompatActivity {
                                 current_state = "req_received";
                                 profileBtn.setText("Принять запрос на добавление");
 
-                                deleteBtn.setVisibility(View.VISIBLE);
-                                deleteBtn.setEnabled(true);
+                                /*deleteBtn.setVisibility(View.VISIBLE);
+                                deleteBtn.setEnabled(true);*/
 
                             } else if(request_type.equals("sent")) {
 
                                 current_state = "req_sent";
                                 profileBtn.setText("Отменить запрос на добавление");
 
-                                deleteBtn.setVisibility(View.INVISIBLE);
-                                deleteBtn.setEnabled(false);
+                                /*deleteBtn.setVisibility(View.INVISIBLE);
+                                deleteBtn.setEnabled(false);*/
 
                             }
 
@@ -124,8 +127,8 @@ public class ProfileActivity extends AppCompatActivity {
                                        current_state = "friends";
                                        profileBtn.setText("Удалить контакт");
 
-                                       deleteBtn.setVisibility(View.INVISIBLE);
-                                       deleteBtn.setEnabled(false);
+                                       /*deleteBtn.setVisibility(View.INVISIBLE);
+                                       deleteBtn.setEnabled(false);*/
 
                                    }
 
@@ -163,7 +166,7 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                profileBtn.setEnabled(false);
+                //profileBtn.setEnabled(false);
 
                 //------------------------ Не в друзьях -----------------------
 
@@ -179,12 +182,22 @@ public class ProfileActivity extends AppCompatActivity {
                                    @Override
                                    public void onSuccess(Void aVoid) {
 
-                                       profileBtn.setEnabled(true);
-                                       current_state = "req_sent";
-                                       profileBtn.setText("Отменить запрос на добавление");
+                                       HashMap<String, String> notificationData = new HashMap<>();
+                                       notificationData.put("from", mCurrent_user.getUid());
+                                       notificationData.put("type", "request");
 
-                                       deleteBtn.setVisibility(View.INVISIBLE);
-                                       deleteBtn.setEnabled(false);
+                                       mNotificationDatabase.child(user_id).push().setValue(notificationData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                           @Override
+                                           public void onSuccess(Void aVoid) {
+
+                                               current_state = "req_sent";
+                                               profileBtn.setText("Отменить запрос на добавление");
+
+                                               /*deleteBtn.setVisibility(View.INVISIBLE);
+                                               deleteBtn.setEnabled(false);*/
+
+                                           }
+                                       });
 
                                       // Toast.makeText(ProfileActivity.this, "Запрос успешно отправлен", Toast.LENGTH_LONG).show();
 
@@ -218,8 +231,8 @@ public class ProfileActivity extends AppCompatActivity {
                                     current_state = "not_friends";
                                     profileBtn.setText("Добавить в контакты");
 
-                                    deleteBtn.setVisibility(View.INVISIBLE);
-                                    deleteBtn.setEnabled(false);
+                                    /*deleteBtn.setVisibility(View.INVISIBLE);
+                                    deleteBtn.setEnabled(false);*/
 
                                 }
                             });
@@ -256,8 +269,8 @@ public class ProfileActivity extends AppCompatActivity {
                                                     current_state = "friends";
                                                     profileBtn.setText("Удалить контакт");
 
-                                                    deleteBtn.setVisibility(View.INVISIBLE);
-                                                    deleteBtn.setEnabled(false);
+                                                    /*deleteBtn.setVisibility(View.INVISIBLE);
+                                                    deleteBtn.setEnabled(false);*/
 
                                                 }
                                             });
