@@ -1,6 +1,7 @@
 package com.den.vin.dchat;
 
 import android.app.ProgressDialog;
+import android.graphics.LightingColorFilter;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import com.squareup.picasso.Picasso;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -36,6 +38,7 @@ public class ProfileActivity extends AppCompatActivity {
     private DatabaseReference mFriendRequestDatabase;
     private DatabaseReference mFriendDatabase;
     private DatabaseReference mNotificationDatabase;
+    private DatabaseReference mRootRef;
 
     private FirebaseUser mCurrent_user;
 
@@ -55,6 +58,7 @@ public class ProfileActivity extends AppCompatActivity {
         mFriendRequestDatabase = FirebaseDatabase.getInstance().getReference().child("Friend_req");
         mFriendDatabase = FirebaseDatabase.getInstance().getReference().child("Friend");
         mNotificationDatabase = FirebaseDatabase.getInstance().getReference().child("notifications");
+        mRootRef = FirebaseDatabase.getInstance().getReference();
         mCurrent_user = FirebaseAuth.getInstance().getCurrentUser();
 
         profileImage = (ImageView) findViewById(R.id.profile_image);
@@ -62,7 +66,10 @@ public class ProfileActivity extends AppCompatActivity {
         profileStatus = (TextView) findViewById(R.id.profile_status);
         profileFriendsCount = (TextView) findViewById(R.id.profile_totalFriends);
         profileBtn = (Button) findViewById(R.id.profile_send_cont_btn);
-        //deleteBtn = (Button) findViewById(R.id.delete_friend_btn);
+        deleteBtn = (Button) findViewById(R.id.delete_friend_btn);
+
+        deleteBtn.setVisibility(View.INVISIBLE);
+        deleteBtn.setEnabled(false);
 
         current_state = "not_friends";
 
@@ -100,17 +107,19 @@ public class ProfileActivity extends AppCompatActivity {
 
                                 current_state = "req_received";
                                 profileBtn.setText("Принять запрос на добавление");
+                                profileBtn.getBackground().setColorFilter(new LightingColorFilter(0x388E3C, 0x000000));
 
-                                /*deleteBtn.setVisibility(View.VISIBLE);
-                                deleteBtn.setEnabled(true);*/
+                                deleteBtn.setVisibility(View.VISIBLE);
+                                deleteBtn.setEnabled(true);
 
                             } else if(request_type.equals("sent")) {
 
                                 current_state = "req_sent";
                                 profileBtn.setText("Отменить запрос на добавление");
+                                profileBtn.getBackground().setColorFilter(new LightingColorFilter(0xff5521, 0x000000));
 
-                                /*deleteBtn.setVisibility(View.INVISIBLE);
-                                deleteBtn.setEnabled(false);*/
+                                deleteBtn.setVisibility(View.INVISIBLE);
+                                deleteBtn.setEnabled(false);
 
                             }
 
@@ -125,10 +134,11 @@ public class ProfileActivity extends AppCompatActivity {
                                    if(dataSnapshot.hasChild(user_id)){
 
                                        current_state = "friends";
-                                       profileBtn.setText("Удалить контакт");
+                                       profileBtn.setText("Удалить из контактов");
+                                       profileBtn.getBackground().setColorFilter(new LightingColorFilter(0xff5521, 0x000000));
 
-                                       /*deleteBtn.setVisibility(View.INVISIBLE);
-                                       deleteBtn.setEnabled(false);*/
+                                       deleteBtn.setVisibility(View.INVISIBLE);
+                                       deleteBtn.setEnabled(false);
 
                                    }
 
@@ -166,52 +176,47 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                //profileBtn.setEnabled(false);
+                profileBtn.setEnabled(false);
 
                 //------------------------ Не в друзьях -----------------------
 
                 if(current_state.equals("not_friends")){
 
-                   mFriendRequestDatabase.child(mCurrent_user.getUid()).child(user_id).child("request_type").setValue("sent").addOnCompleteListener(new OnCompleteListener<Void>() {
-                       @Override
-                       public void onComplete(@NonNull Task<Void> task) {
+                    DatabaseReference newNotificationRef = mRootRef.child("notifications").child(user_id).push();
+                    String newNotificationId = newNotificationRef.getKey();
 
-                           if(task.isSuccessful()){
+                    HashMap<String, String> notificationData = new HashMap<>();
+                    notificationData.put("from", mCurrent_user.getUid());
+                    notificationData.put("type", "request");
 
-                               mFriendRequestDatabase.child(user_id).child(mCurrent_user.getUid()).child("request_type").setValue("received").addOnSuccessListener(new OnSuccessListener<Void>() {
-                                   @Override
-                                   public void onSuccess(Void aVoid) {
+                    Map requestMap = new HashMap();
+                    requestMap.put("Friend_req/" + mCurrent_user.getUid() + "/" + user_id + "/request_type", "sent");
+                    requestMap.put("Friend_req/" + user_id + "/" + mCurrent_user.getUid() + "/request_type", "received");
+                    requestMap.put("notifications/" + user_id + "/" + newNotificationId, notificationData);
 
-                                       HashMap<String, String> notificationData = new HashMap<>();
-                                       notificationData.put("from", mCurrent_user.getUid());
-                                       notificationData.put("type", "request");
+                    mRootRef.updateChildren(requestMap, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
 
-                                       mNotificationDatabase.child(user_id).push().setValue(notificationData).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                           @Override
-                                           public void onSuccess(Void aVoid) {
+                            if(databaseError != null){
 
-                                               current_state = "req_sent";
-                                               profileBtn.setText("Отменить запрос на добавление");
+                                Toast.makeText(ProfileActivity.this, "Ошибка: "+databaseError.getMessage(), Toast.LENGTH_LONG).show();
 
-                                               /*deleteBtn.setVisibility(View.INVISIBLE);
-                                               deleteBtn.setEnabled(false);*/
+                            } else {
 
-                                           }
-                                       });
+                                profileBtn.setEnabled(true);
 
-                                      // Toast.makeText(ProfileActivity.this, "Запрос успешно отправлен", Toast.LENGTH_LONG).show();
+                                current_state = "req_sent";
+                                profileBtn.setText("Отменить запрос на добавление");
+                                profileBtn.getBackground().setColorFilter(new LightingColorFilter(0xff5521, 0x000000));
 
-                                   }
-                               });
+                                deleteBtn.setVisibility(View.INVISIBLE);
+                                deleteBtn.setEnabled(false);
 
-                           }else {
+                            }
 
-                               Toast.makeText(ProfileActivity.this, "Ошибка: "+task.getException().toString(), Toast.LENGTH_LONG).show();
-
-                           }
-
-                       }
-                   });
+                        }
+                    });
 
                 }
 
@@ -230,9 +235,10 @@ public class ProfileActivity extends AppCompatActivity {
                                     profileBtn.setEnabled(true);
                                     current_state = "not_friends";
                                     profileBtn.setText("Добавить в контакты");
+                                    profileBtn.getBackground().setColorFilter(new LightingColorFilter(0xff5521, 0x000000));
 
-                                    /*deleteBtn.setVisibility(View.INVISIBLE);
-                                    deleteBtn.setEnabled(false);*/
+                                    deleteBtn.setVisibility(View.INVISIBLE);
+                                    deleteBtn.setEnabled(false);
 
                                 }
                             });
@@ -267,10 +273,11 @@ public class ProfileActivity extends AppCompatActivity {
 
                                                     profileBtn.setEnabled(true);
                                                     current_state = "friends";
-                                                    profileBtn.setText("Удалить контакт");
+                                                    profileBtn.setText("Удалить из контактов");
+                                                    profileBtn.getBackground().setColorFilter(new LightingColorFilter(0xff5521, 0x000000));
 
-                                                    /*deleteBtn.setVisibility(View.INVISIBLE);
-                                                    deleteBtn.setEnabled(false);*/
+                                                    deleteBtn.setVisibility(View.INVISIBLE);
+                                                    deleteBtn.setEnabled(false);
 
                                                 }
                                             });
@@ -280,6 +287,41 @@ public class ProfileActivity extends AppCompatActivity {
 
                                 }
                             });
+
+                        }
+                    });
+
+                }
+
+                //------------------------------ УДАЛЕНИЕ ИЗ ДРУЗЕЙ -----------------
+
+                if(current_state.equals("friends")){
+
+                    Map unfrendMap = new HashMap();
+
+                    unfrendMap.put("Friend/" + mCurrent_user.getUid() + "/" + user_id, null);
+                    unfrendMap.put("Friend/" + user_id + "/" + mCurrent_user.getUid(), null);
+
+                    mRootRef.updateChildren(unfrendMap, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+
+                            if(databaseError != null){
+
+                                Toast.makeText(ProfileActivity.this, "Ошибка: "+databaseError.getMessage(), Toast.LENGTH_LONG).show();
+
+                            } else {
+
+                                current_state = "not_friends";
+                                profileBtn.setText("Добавить в контакты");
+                                profileBtn.getBackground().setColorFilter(new LightingColorFilter(0xff5521, 0x000000));
+
+                                deleteBtn.setVisibility(View.INVISIBLE);
+                                deleteBtn.setEnabled(false);
+
+                            }
+
+                            profileBtn.setEnabled(true);
 
                         }
                     });

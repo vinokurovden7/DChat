@@ -22,5 +22,5 @@
     <string name="comment">Комментарий</string>
     <string name="post_query">подать запрос</string>
     <string name="add_to_contact">Добавить в контакты</string>
-    <string name="remove_contact">Удалить из контактов</string>
+    <string name="remove_contact">Отклонить запрос на добавление</string>
 </resources>

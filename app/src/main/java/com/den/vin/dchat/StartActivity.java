@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class StartActivity extends AppCompatActivity {
 
@@ -20,24 +21,28 @@ public class StartActivity extends AppCompatActivity {
         mLoginBtn = (Button) findViewById(R.id.startLoginBtn);
 
         //Переход к созданию нового аккаунта
-        mRegBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        try {
+            mRegBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-                Intent reg_intent = new Intent(StartActivity.this, RegisterActivity.class);
-                startActivity(reg_intent);
+                    Intent reg_intent = new Intent(StartActivity.this, RegisterActivity.class);
+                    startActivity(reg_intent);
 
-            }
-        });
+                }
+            });
 
-        //Переход к авторизации существующего аккаунта
-        mLoginBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent login_intent = new Intent(StartActivity.this, LoginActivity.class);
-                startActivity(login_intent);
-            }
-        });
+            //Переход к авторизации существующего аккаунта
+            mLoginBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent login_intent = new Intent(StartActivity.this, LoginActivity.class);
+                    startActivity(login_intent);
+                }
+            });
+        } catch (Exception e) {
+            Toast.makeText(StartActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+        }
 
     }
 }

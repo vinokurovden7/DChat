@@ -61,7 +61,7 @@
         android:text="@string/add_to_contact"
         android:textColor="#FFFFFFFF" />
 
-    <!--Button
+    <Button
         android:id="@+id/delete_friend_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -70,6 +70,6 @@
         android:layout_marginBottom="20dp"
         android:backgroundTint="@color/colorAccent"
         android:text="@string/remove_contact"
-        android:textColor="#FFFFFFFF" /-->
+        android:textColor="#FFFFFFFF" />
 
 </RelativeLayout>
