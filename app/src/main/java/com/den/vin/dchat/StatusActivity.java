@@ -1,10 +1,10 @@
 package com.den.vin.dchat;
 
 import android.app.ProgressDialog;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
@@ -22,21 +22,23 @@ public class StatusActivity extends AppCompatActivity {
     private Toolbar mToolbar;
 
     private TextInputLayout mStatus;
-    private Button mPostBtn;
+    private Button mSavebtn;
 
+
+    //Firebase
     private DatabaseReference mStatusDatabase;
     private FirebaseUser mCurrentUser;
 
-    //ProgressDialog
-    private ProgressDialog mRegProgress;
+
+    //Progress
+    private ProgressDialog mProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_status);
 
-        mRegProgress = new ProgressDialog(this);
-
+        //Firebase
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         String current_uid = mCurrentUser.getUid();
 
@@ -44,47 +46,50 @@ public class StatusActivity extends AppCompatActivity {
 
         mToolbar = (Toolbar) findViewById(R.id.status_appBar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("Смена статуса аккаунта");
+        getSupportActionBar().setTitle("Статус аккаунта");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mStatus = (TextInputLayout) findViewById(R.id.status);
-        mPostBtn = (Button) findViewById(R.id.status_btn);
 
         String status_value = getIntent().getStringExtra("status_value");
 
+        mStatus = (TextInputLayout) findViewById(R.id.status_input);
+        mSavebtn = (Button) findViewById(R.id.status_save_btn);
+
         mStatus.getEditText().setText(status_value);
 
-        mPostBtn.setOnClickListener(new View.OnClickListener() {
+        mSavebtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
 
-                mRegProgress.setTitle("Сохранение изменений");
-                mRegProgress.setMessage("Сохранение изменений, пожалуйста подождите...");
-                mRegProgress.setCanceledOnTouchOutside(false);
-                mRegProgress.show();
+                //Progress
+                mProgress = new ProgressDialog(StatusActivity.this);
+                mProgress.setTitle("Сохранение настроек");
+                mProgress.setMessage("Пожалуйста подождите, идет сохранение настроек");
+                mProgress.show();
 
                 String status = mStatus.getEditText().getText().toString();
 
                 mStatusDatabase.child("status").setValue(status).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            mRegProgress.dismiss();
-                            /*Intent setting_intent = new Intent(StatusActivity.this, SettingsActivity.class);
-                            startActivity(setting_intent);*/
-                            finish();
+
+                        if(task.isSuccessful()){
+
+                            mProgress.dismiss();
+
+                        } else {
+
+                            Toast.makeText(getApplicationContext(), "Ошибка сохранения настроек.", Toast.LENGTH_LONG).show();
+
                         }
-                        else {
-                            mRegProgress.hide();
-                            Toast.makeText(getApplicationContext(), "Ошибка операции сохранения", Toast.LENGTH_LONG).show();
-                        }
+
                     }
                 });
 
             }
         });
 
+
+
     }
-
-
 }

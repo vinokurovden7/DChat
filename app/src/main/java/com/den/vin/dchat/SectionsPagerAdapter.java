@@ -1,32 +1,40 @@
 package com.den.vin.dchat;
 
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-class SectionPagerAdapter extends FragmentPagerAdapter {
+/**
+ * Created by AkshayeJH on 11/06/17.
+ */
 
-    public SectionPagerAdapter(FragmentManager fm) {
+class SectionsPagerAdapter extends FragmentPagerAdapter{
+
+
+    public SectionsPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 
     @Override
     public Fragment getItem(int position) {
 
-        switch(position){
+        switch(position) {
             case 0:
                 RequestsFragment requestsFragment = new RequestsFragment();
                 return requestsFragment;
+
             case 1:
                 ChatsFragment chatsFragment = new ChatsFragment();
-                return chatsFragment;
+                return  chatsFragment;
+
             case 2:
-                FriendsFagment friendsFagment = new FriendsFagment();
-                return friendsFagment;
+                FriendsFragment friendsFragment = new FriendsFragment();
+                return friendsFragment;
+
             default:
-                return null;
+                return  null;
         }
+
     }
 
     @Override
@@ -34,19 +42,22 @@ class SectionPagerAdapter extends FragmentPagerAdapter {
         return 3;
     }
 
-    @Nullable
-    @Override
-    public CharSequence getPageTitle(int position) {
+    public CharSequence getPageTitle(int position){
 
-        switch(position){
+        switch (position) {
             case 0:
                 return "Запросы";
+
             case 1:
                 return "Чаты";
+
             case 2:
                 return "Контакты";
+
             default:
                 return null;
         }
+
     }
+
 }

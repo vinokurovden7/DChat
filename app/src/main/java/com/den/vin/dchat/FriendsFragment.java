@@ -1,12 +1,13 @@
 package com.den.vin.dchat;
 
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,7 +31,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class FriendsFagment extends Fragment {
+public class FriendsFragment extends Fragment {
 
     private RecyclerView mFriendsList;
 
@@ -45,7 +45,7 @@ public class FriendsFagment extends Fragment {
     private View mMainView;
 
 
-    public FriendsFagment() {
+    public FriendsFragment() {
         // Required empty public constructor
     }
 
@@ -61,7 +61,7 @@ public class FriendsFagment extends Fragment {
 
         mCurrent_user_id = mAuth.getCurrentUser().getUid();
 
-        mFriendsDatabase = FirebaseDatabase.getInstance().getReference().child("Friend").child(mCurrent_user_id);
+        mFriendsDatabase = FirebaseDatabase.getInstance().getReference().child("Friends").child(mCurrent_user_id);
         mFriendsDatabase.keepSynced(true);
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
         mUsersDatabase.keepSynced(true);
@@ -73,6 +73,7 @@ public class FriendsFagment extends Fragment {
         // Inflate the layout for this fragment
         return mMainView;
     }
+
 
     @Override
     public void onStart() {
@@ -115,11 +116,11 @@ public class FriendsFagment extends Fragment {
                             @Override
                             public void onClick(View view) {
 
-                                CharSequence options[] = new CharSequence[]{"Open Profile", "Send message"};
+                                CharSequence options[] = new CharSequence[]{"Открыть профиль", "Отправить сообщение"};
 
                                 final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
-                                builder.setTitle("Select Options");
+                                builder.setTitle("Выберите действие");
                                 builder.setItems(options, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -133,14 +134,14 @@ public class FriendsFagment extends Fragment {
 
                                         }
 
-                                        /*if(i == 1){
+                                        if(i == 1){
 
                                             Intent chatIntent = new Intent(getContext(), ChatActivity.class);
                                             chatIntent.putExtra("user_id", list_user_id);
                                             chatIntent.putExtra("user_name", userName);
                                             startActivity(chatIntent);
 
-                                        }*/
+                                        }
 
                                     }
                                 });
@@ -196,13 +197,13 @@ public class FriendsFagment extends Fragment {
         public void setUserImage(String thumb_image, Context ctx){
 
             CircleImageView userImageView = (CircleImageView) mView.findViewById(R.id.user_single_image);
-            Picasso.with(ctx).load(thumb_image).placeholder(R.drawable.default_account_icon).into(userImageView);
+            Picasso.with(ctx).load(thumb_image).placeholder(R.drawable.default_avatar).into(userImageView);
 
         }
 
         public void setUserOnline(String online_status) {
 
-            ImageView userOnlineView = (ImageView) mView.findViewById(R.id.user_single_image);
+            ImageView userOnlineView = (ImageView) mView.findViewById(R.id.user_single_online_icon);
 
             if(online_status.equals("true")){
 

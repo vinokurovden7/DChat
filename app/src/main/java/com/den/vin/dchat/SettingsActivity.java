@@ -1,14 +1,20 @@
 package com.den.vin.dchat;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.text.InputType;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,11 +34,14 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
@@ -42,58 +51,44 @@ public class SettingsActivity extends AppCompatActivity {
     private DatabaseReference mUserDatabase;
     private FirebaseUser mCurrentUser;
 
-    private TextView profile_name;
-    private TextView profile_status;
 
-    private Button profile_status_btn;
-    private Button profile_avatar_btn;
+    //Android Layout
 
-    private static final int GALLERY_PIC = 1;
+    private CircleImageView mDisplayImage;
+    private TextView mName;
+    private TextView mStatus;
 
-    //Storage Firebase
+    private Button mStatusBtn;
+    private Button mImageBtn;
+
+
+    private static final int GALLERY_PICK = 1;
+
+    // Storage Firebase
     private StorageReference mImageStorage;
 
-    private CircleImageView mImage;
-
-    //ProgressDialog
-    private ProgressDialog mRegProgress;
     private ProgressDialog mProgressDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        mRegProgress = new ProgressDialog(this);
+        mDisplayImage = (CircleImageView) findViewById(R.id.settings_image);
+        mName = (TextView) findViewById(R.id.settings_name);
+        mStatus = (TextView) findViewById(R.id.settings_status);
 
-        mRegProgress.setTitle("Профиль");
-        mRegProgress.setMessage("Загрузка данных профиля, пожалуйста подождите...");
-        mRegProgress.setCanceledOnTouchOutside(false);
-        mRegProgress.show();
-
-        mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
-        String current_uid = mCurrentUser.getUid();
-
-        profile_name = (TextView) findViewById(R.id.profile_name);
-        profile_status = (TextView) findViewById(R.id.profile_status);
-        mImage = (CircleImageView) findViewById(R.id.settings_image);
-        profile_avatar_btn = (Button) findViewById(R.id.profile_avatar_btn);
-        profile_status_btn = (Button) findViewById(R.id.profile_status_btn);
+        mStatusBtn = (Button) findViewById(R.id.settings_status_btn);
+        mImageBtn = (Button) findViewById(R.id.settings_image_btn);
 
         mImageStorage = FirebaseStorage.getInstance().getReference();
 
-        profile_status_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
 
-                String status_value = profile_status.getText().toString();
+        String current_uid = mCurrentUser.getUid();
 
-                Intent status_intent = new Intent(SettingsActivity.this, StatusActivity.class);
-                status_intent.putExtra("status_value", status_value);
-                startActivity(status_intent);
 
-            }
-        });
 
         mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(current_uid);
         mUserDatabase.keepSynced(true);
@@ -107,14 +102,15 @@ public class SettingsActivity extends AppCompatActivity {
                 String status = dataSnapshot.child("status").getValue().toString();
                 String thumb_image = dataSnapshot.child("thumb_image").getValue().toString();
 
-                profile_name.setText(name);
-                profile_status.setText(status);
+                mName.setText(name);
+                mStatus.setText(status);
 
-                if (!image.equals("default")) {
+                if(!image.equals("default")) {
 
-                    //Picasso.with(SettingsActivity.this).load(image).placeholder(R.drawable.default_account_icon).into(mImage);
+                    //Picasso.with(SettingsActivity.this).load(image).placeholder(R.drawable.default_avatar).into(mDisplayImage);
 
-                    Picasso.with(SettingsActivity.this).load(image).networkPolicy(NetworkPolicy.OFFLINE).placeholder(R.drawable.default_account_icon).into(mImage, new Callback() {
+                    Picasso.with(SettingsActivity.this).load(image).networkPolicy(NetworkPolicy.OFFLINE)
+                            .placeholder(R.drawable.default_avatar).into(mDisplayImage, new Callback() {
                         @Override
                         public void onSuccess() {
 
@@ -123,15 +119,13 @@ public class SettingsActivity extends AppCompatActivity {
                         @Override
                         public void onError() {
 
-                            Picasso.with(SettingsActivity.this).load(image).placeholder(R.drawable.default_account_icon).into(mImage);
+                            Picasso.with(SettingsActivity.this).load(image).placeholder(R.drawable.default_avatar).into(mDisplayImage);
 
                         }
                     });
 
                 }
 
-
-                mRegProgress.dismiss();
 
             }
 
@@ -141,58 +135,87 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        profile_avatar_btn.setOnClickListener(new View.OnClickListener() {
+
+        mStatusBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
 
-                Intent galerryIntent = new Intent();
-                galerryIntent.setType("image/*");
-                galerryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(galerryIntent, "Выберите фотографию"), GALLERY_PIC);
+                String status_value = mStatus.getText().toString();
 
-                /*CropImage.activity()
-                        .setGuidelines(CropImageView.Guidelines.ON)
-                        .start(SettingsActivity.this);*/
+                Intent status_intent = new Intent(SettingsActivity.this, StatusActivity.class);
+                status_intent.putExtra("status_value", status_value);
+                startActivity(status_intent);
 
             }
         });
 
+
+        mImageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                Intent galleryIntent = new Intent();
+                galleryIntent.setType("image/*");
+                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+
+                startActivityForResult(Intent.createChooser(galleryIntent, "Выберите изображение"), GALLERY_PICK);
+
+
+                /*
+                CropImage.activity()
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .start(SettingsActivity.this);
+                        */
+
+            }
+        });
+
+
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == GALLERY_PIC && resultCode == RESULT_OK){
+        if(requestCode == GALLERY_PICK && resultCode == RESULT_OK){
 
             Uri imageUri = data.getData();
 
             CropImage.activity(imageUri)
-                    .setAspectRatio(1,1)
-                    .start(SettingsActivity.this);
+                    .setAspectRatio(1, 1)
+                    .setMinCropWindowSize(500, 500)
+                    .start(this);
+
+            //Toast.makeText(SettingsActivity.this, imageUri, Toast.LENGTH_LONG).show();
 
         }
 
-        if(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
+
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
 
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
             if (resultCode == RESULT_OK) {
 
-                mProgressDialog = new ProgressDialog(SettingsActivity.this);
 
-                mProgressDialog.setTitle("Загрузка фотографии");
-                mProgressDialog.setMessage("Загрузка фотографии профиля, пожалуйста подождите...");
+                mProgressDialog = new ProgressDialog(SettingsActivity.this);
+                mProgressDialog.setTitle("Загрузка изображения...");
+                mProgressDialog.setMessage("Пожалуйста подождите, пока идет процесс загрузки изображения.");
                 mProgressDialog.setCanceledOnTouchOutside(false);
                 mProgressDialog.show();
+
 
                 Uri resultUri = result.getUri();
 
                 File thumb_filePath = new File(resultUri.getPath());
 
+                String current_user_id = mCurrentUser.getUid();
+
+
                 Bitmap thumb_bitmap = new Compressor(this)
-                        .setMaxWidth(1024)
-                        .setMaxHeight(1024)
+                        .setMaxWidth(200)
+                        .setMaxHeight(200)
                         .setQuality(75)
                         .compressToBitmap(thumb_filePath);
 
@@ -200,14 +223,17 @@ public class SettingsActivity extends AppCompatActivity {
                 thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 final byte[] thumb_byte = baos.toByteArray();
 
-                StorageReference filepath = mImageStorage.child("profile_image").child(mCurrentUser.getEmail()).child("profile_image.jpg");
-                final StorageReference thumb_filepath = mImageStorage.child("profile_image").child("thumbs").child(mCurrentUser.getEmail()).child("profile_thumbs.jpg");
+
+                StorageReference filepath = mImageStorage.child("profile_images").child(current_user_id + ".jpg");
+                final StorageReference thumb_filepath = mImageStorage.child("profile_images").child("thumbs").child(current_user_id + ".jpg");
+
+
 
                 filepath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
 
-                        if (task.isSuccessful()){
+                        if(task.isSuccessful()){
 
                             final String download_url = task.getResult().getDownloadUrl().toString();
 
@@ -216,14 +242,13 @@ public class SettingsActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
 
-                                    final String thumb_downloadURL = thumb_task.getResult().getDownloadUrl().toString();
+                                    String thumb_downloadUrl = thumb_task.getResult().getDownloadUrl().toString();
 
                                     if(thumb_task.isSuccessful()){
 
-                                        //HashMap<String,String> update_hashMap = new HashMap<>();
                                         Map update_hashMap = new HashMap();
                                         update_hashMap.put("image", download_url);
-                                        update_hashMap.put("thumb_image", thumb_downloadURL);
+                                        update_hashMap.put("thumb_image", thumb_downloadUrl);
 
                                         mUserDatabase.updateChildren(update_hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
@@ -232,29 +257,30 @@ public class SettingsActivity extends AppCompatActivity {
                                                 if(task.isSuccessful()){
 
                                                     mProgressDialog.dismiss();
-                                                    Toast.makeText(getApplicationContext(), "Файл успешно загружен!", Toast.LENGTH_LONG).show();
-                                                    Picasso.with(SettingsActivity.this).load(thumb_downloadURL).into(mImage);
+                                                    Toast.makeText(SettingsActivity.this, "Успешная загрузка.", Toast.LENGTH_LONG).show();
 
-                                                } else {
-                                                    Toast.makeText(getApplicationContext(), "Ошибка загрузки файла: "+task.getException().toString(), Toast.LENGTH_LONG).show();
                                                 }
 
                                             }
                                         });
-                                    }
-                                    else {
 
-                                        Toast.makeText(getApplicationContext(), "Ошибка загрузки файла: "+thumb_task.getException().toString(), Toast.LENGTH_LONG).show();
+
+                                    } else {
+
+                                        Toast.makeText(SettingsActivity.this, "Ошибка загрузки изображения.", Toast.LENGTH_LONG).show();
                                         mProgressDialog.dismiss();
 
                                     }
 
+
                                 }
                             });
 
+
+
                         } else {
 
-                            Toast.makeText(getApplicationContext(), "Ошибка загрузки файла: "+task.getException().toString(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(SettingsActivity.this, "Ошибка загрузки.", Toast.LENGTH_LONG).show();
                             mProgressDialog.dismiss();
 
                         }
@@ -262,12 +288,16 @@ public class SettingsActivity extends AppCompatActivity {
                     }
                 });
 
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE){
+
+
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
 
                 Exception error = result.getError();
 
             }
         }
 
+
     }
+
 }

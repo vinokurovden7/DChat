@@ -11,43 +11,45 @@
         layout="@layout/app_bar_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/reg_disp_name"
+        android:id="@+id/register_display_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="35dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/reg_emale"
-        app:layout_constraintTop_toBottomOf="@+id/textView2">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/login_label">
 
-        <android.support.design.widget.TextInputEditText
+        <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/reg_name"
-            android:inputType="textPersonName" />
+            android:hint="@string/display_name" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/reg_emale"
+        android:id="@+id/register_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/reg_disp_name">
+        app:layout_constraintTop_toBottomOf="@+id/register_display_name">
 
-        <android.support.design.widget.TextInputEditText
+        <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/reg_email"
+            android:hint="@string/email"
             android:inputType="textEmailAddress" />
     </android.support.design.widget.TextInputLayout>
 
@@ -57,13 +59,15 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        app:layout_constraintTop_toBottomOf="@+id/reg_emale">
+        android:layout_marginTop="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/register_email">
 
-        <android.support.design.widget.TextInputEditText
+        <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/reg_password"
+            android:hint="@string/password"
             android:inputType="textPassword" />
     </android.support.design.widget.TextInputLayout>
 
@@ -71,26 +75,31 @@
         android:id="@+id/reg_create_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"
-        android:text="@string/reg_create_account_btn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/reg_password"
         android:backgroundTint="@color/colorAccent"
-        android:textColor="#FFFFFFFF"/>
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:text="@string/create_account"
+        android:textColor="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/reg_password" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/login_label"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="50dp"
-        android:text="@string/createNewAcc"
+        android:layout_marginTop="35dp"
+        android:text="@string/create_a_new_account"
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_toolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/register_toolbar"
+        tools:layout_editor_absoluteX="26dp"
+        tools:layout_editor_absoluteY="104dp" />
+
 
 </android.support.constraint.ConstraintLayout>

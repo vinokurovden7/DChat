@@ -4,51 +4,46 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".StartActivity"
-    android:background="@color/colorPrimary">
+    android:background="@color/colorPrimary"
+    tools:context=".StartActivity">
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="250dp"
-        android:layout_marginTop="40dp"
-        android:layout_below="@id/imageView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="@string/Welcome"
+        android:layout_above="@+id/start_login_btn"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="50dp"
+        android:text="@string/welcome_text"
         android:textAlignment="center"
-        android:textColor="@android:color/background_light"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:textColor="@android:color/white"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:width="200dp"/>
 
     <Button
-        android:id="@+id/startLoginBtn"
+        android:id="@+id/start_reg_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
-        android:layout_below="@id/textView"
-        android:text="@string/have_account"
+        android:layout_marginBottom="50dp"
+        android:backgroundTint="@android:color/white"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp"
+        android:text="@string/need_a_new_account"
+        android:textColor="@color/colorPrimary" />
+
+    <Button
+        android:id="@+id/start_login_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/start_reg_btn"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
         android:backgroundTint="@color/colorAccent"
-        android:textColor="#FFFFFFFF"/>
-
-    <Button
-        android:id="@+id/startRegBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
-        android:layout_below="@id/startLoginBtn"
-        android:text="@string/create_new_account"
-        android:backgroundTint="#FFFFFFFF"
-        android:textColor="@color/colorPrimary"/>
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="263dp"
-        android:layout_height="114dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="81dp"
-        app:srcCompat="@drawable/sonkron" />
-
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:text="@string/have_account"
+        android:textColor="@android:color/white" />
 </RelativeLayout>

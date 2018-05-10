@@ -1,8 +1,17 @@
 package com.den.vin.dchat;
 
+/**
+ * Created by AkshayeJH on 19/06/17.
+ */
+
 public class Users {
 
-    public String name, image, status, thumb_image;
+    public String name;
+    public String image;
+    public String status;
+    public String thumb_image;
+
+
 
     public Users(){
 
@@ -46,4 +55,5 @@ public class Users {
     public void setThumb_image(String thumb_image) {
         this.thumb_image = thumb_image;
     }
+
 }
