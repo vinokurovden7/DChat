@@ -24,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -273,11 +274,13 @@ public class ProfileActivity extends AppCompatActivity {
 
                 if(mCurrent_state.equals("req_received")){
 
-                    final String currentDate = DateFormat.getDateTimeInstance().format(new Date());
+                    final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yy HH:mm");
+
+                    final String currentDate = DATE_FORMAT.format(new Date());
 
                     Map friendsMap = new HashMap();
-                    friendsMap.put("Friends/" + mCurrent_user.getUid() + "/" + user_id + "/date", currentDate);
-                    friendsMap.put("Friends/" + user_id + "/"  + mCurrent_user.getUid() + "/date", currentDate);
+                    friendsMap.put("Friends/" + mCurrent_user.getUid() + "/" + user_id + "/status", currentDate);
+                    friendsMap.put("Friends/" + user_id + "/"  + mCurrent_user.getUid() + "/status", currentDate);
 
 
                     friendsMap.put("Friend_req/" + mCurrent_user.getUid() + "/" + user_id, null);

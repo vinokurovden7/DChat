@@ -6,21 +6,21 @@ package com.den.vin.dchat;
 
 public class Friends {
 
-    public String date;
+    public String status;
 
     public Friends(){
 
     }
 
-    public Friends(String date) {
-        this.date = date;
+    public Friends(String status) {
+        this.status = status;
     }
 
-    public String getDate() {
-        return date;
+    public String getStatus() {
+        return status;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

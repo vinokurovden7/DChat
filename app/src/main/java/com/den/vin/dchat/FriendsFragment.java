@@ -91,7 +91,7 @@ public class FriendsFragment extends Fragment {
             @Override
             protected void populateViewHolder(final FriendsViewHolder friendsViewHolder, Friends friends, int i) {
 
-                friendsViewHolder.setDate(friends.getDate());
+                friendsViewHolder.setStatus(friends.getStatus());
 
                 final String list_user_id = getRef(i).getKey();
 
@@ -180,10 +180,10 @@ public class FriendsFragment extends Fragment {
 
         }
 
-        public void setDate(String date){
+        public void setStatus(String status){
 
             TextView userStatusView = (TextView) mView.findViewById(R.id.user_single_status);
-            userStatusView.setText(date);
+            userStatusView.setText(status);
 
         }
 
